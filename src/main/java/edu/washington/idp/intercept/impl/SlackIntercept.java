@@ -39,6 +39,7 @@ import net.shibboleth.utilities.java.support.logic.Constraint;
 import net.shibboleth.utilities.java.support.logic.FunctionSupport;
 
 import org.opensaml.profile.context.ProfileRequestContext;
+import net.shibboleth.idp.authn.context.SubjectContext;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -89,13 +90,19 @@ public class SlackIntercept {
     }
 
     public boolean testSlack(@Nullable final ProfileRequestContext input) {
-        username = usernameLookupStrategy.apply(input);
+        SubjectContext subject = input.getSubcontext(SubjectContext.class);
+        if (subject == null) {
+            log.warn("No subject context found");
+            return true;  // fail pass
+        }
+       
+        username = subject.getPrincipalName();
         if (username == null) {
             log.warn("No principal name available to check Slack status");
             // ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
             return true;  // fail pass
         }
-
+        log.debug("user " + username + " found in SubjectContext");
 
         // see if user has the Slack group membership - assume yes on errors
 
@@ -110,13 +117,15 @@ public class SlackIntercept {
         }
         log.info("Slack lookup: user={}, rp={}", username, rpid);
         if (rpid.startsWith("http://")) rpid = rpid.substring(7);
-        if (rpid.startsWith("https://")) rpid = rpid.substring(8);
+        else if (rpid.startsWith("https://")) rpid = rpid.substring(8);
+        else if (rpid.startsWith("oidc/")) rpid = rpid.substring(5);
+        else rpid = rpid.replaceAll(":", "-");
         if (rpid.indexOf("/")>0) rpid = rpid.substring(0, rpid.indexOf("/"));
         if (!Pattern.matches("[0-9a-zA-Z\\-\\.]+", rpid)) {
            log.info(".. rpid {} not acceptable", rpid);
            return false;
         }
-        log.info(".. group is: " + rpid);
+        log.info("Authz group is: " + rpid);
         try {
            String resp = webClient.getResource(gwsUrlbase + rpid + "/effective_member/" + username);
            if (resp == null) {
@@ -133,7 +142,7 @@ public class SlackIntercept {
            for (JsonValue mbr : data) {
               JsonObject jmbr = (JsonObject) mbr;
               String id = jmbr.getString("id");
-              log.info(".. user " + id + " OK");
+              log.debug(".. user " + id + " OK");
               if (id.equals(username)) return true;
            }
            return false;  // shouldn't get here
