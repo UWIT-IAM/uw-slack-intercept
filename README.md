@@ -2,7 +2,7 @@
 
 * Despite the name, it works for any SP. 
 
-* Decision is based on membership in the group: <base>_<SP's DNS name>
+* Decision is based on membership in the group: (group_base)_<SP's DNS name>
 
 
 
