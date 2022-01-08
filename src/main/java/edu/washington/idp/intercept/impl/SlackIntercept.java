@@ -19,6 +19,8 @@ package edu.washington.idp.intercept.impl;
 
 import java.lang.IllegalArgumentException;
 import java.lang.ClassNotFoundException;
+import java.util.function.Function;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Collection;
@@ -41,7 +43,6 @@ import net.shibboleth.utilities.java.support.logic.FunctionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
 import net.shibboleth.idp.authn.context.SubjectContext;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 
 import edu.washington.shibboleth.tools.UWHttpClient;
@@ -119,13 +120,9 @@ public class SlackIntercept {
         if (rpid.startsWith("http://")) rpid = rpid.substring(7);
         else if (rpid.startsWith("https://")) rpid = rpid.substring(8);
         else if (rpid.startsWith("oidc/")) rpid = rpid.substring(5);
-        else rpid = rpid.replaceAll(":", "-");
+        else rpid = rpid.toLowerCase().replaceAll("[^a-z0-9\\.\\-]", "-");
         if (rpid.indexOf("/")>0) rpid = rpid.substring(0, rpid.indexOf("/"));
-        if (!Pattern.matches("[0-9a-zA-Z\\-\\.]+", rpid)) {
-           log.info(".. rpid {} not acceptable", rpid);
-           return false;
-        }
-        log.info("Authz group is: " + rpid);
+        log.info("Authz subgroup is: " + rpid);
         try {
            String resp = webClient.getResource(gwsUrlbase + rpid + "/effective_member/" + username);
            if (resp == null) {
