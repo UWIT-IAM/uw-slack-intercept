@@ -6,7 +6,7 @@
     <name>Shibboleth IdP :: slack login interceptor</name>
     <artifactId>uw-slack-intercept</artifactId>
     <groupId>edu.washington.iam</groupId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <packaging>jar</packaging>
 
     <repositories>

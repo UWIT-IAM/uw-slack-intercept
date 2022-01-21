@@ -23,6 +23,7 @@ import java.util.function.Function;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -124,7 +125,14 @@ public class SlackIntercept {
         if (rpid.indexOf("/")>0) rpid = rpid.substring(0, rpid.indexOf("/"));
         log.info("Authz subgroup is: " + rpid);
         try {
-           String resp = webClient.getResource(gwsUrlbase + rpid + "/effective_member/" + username);
+           long startDttm = System.currentTimeMillis();
+           String resp = null;
+           try {
+              resp = webClient.getResource(gwsUrlbase + rpid + "/effective_member/" + username);
+           } finally {
+               long duration = System.currentTimeMillis() - startDttm;
+               log.info("Slack lookup finish: user={}, rp={}, time={}", username, rpid, duration);
+           }
            if (resp == null) {
              log.info("null response from gws, for " + rpid);
              return true;
@@ -136,12 +144,27 @@ public class SlackIntercept {
              log.info("not there response from gws, for " + username);
              return false;
            }
+           if (data.size() == 0) {
+             log.info("no records response from gws, for " + username);
+             return false;
+           }
            for (JsonValue mbr : data) {
               JsonObject jmbr = (JsonObject) mbr;
               String id = jmbr.getString("id");
               log.debug(".. user " + id + " OK");
-              if (id.equals(username)) return true;
+              if (id.equals(username)) {
+                  log.info(username + " is a member of authz subgroup: " + rpid);
+                  return true;
+              }
            }
+           // If here, username was not found in the array. Log what was in the array.
+           List<String> idList = new ArrayList<String>();
+           for (JsonValue mbr : data) {
+             JsonObject jmbr = (JsonObject) mbr;
+             String id = jmbr.getString("id");
+             idList.add(id);
+           }
+           log.info("username not found in gws data, for " + username + ", idList = " + idList);
            return false;  // shouldn't get here
         } catch (Exception e) {
            log.error("gws lookup failed: ", e);
