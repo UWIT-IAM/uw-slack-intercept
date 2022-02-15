@@ -65,9 +65,6 @@ public class SlackIntercept {
     /** Lookup strategy for username. */
     @Nonnull private Function<ProfileRequestContext,String> usernameLookupStrategy;
 
-    /** Attempted username. */
-    @Nullable @NotEmpty private String username;
-
     /** Web Client */
     UWHttpClient webClient;
     public void setWebClient(UWHttpClient v) {
@@ -98,7 +95,7 @@ public class SlackIntercept {
             return true;  // fail pass
         }
        
-        username = subject.getPrincipalName();
+        String username = subject.getPrincipalName();
         if (username == null) {
             log.warn("No principal name available to check Slack status");
             // ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);
