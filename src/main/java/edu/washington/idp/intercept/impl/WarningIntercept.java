@@ -37,7 +37,7 @@ import edu.washington.shibboleth.tools.UWHttpClient;
 
 /**
  * Determines if a warning message should be displayed for certain logins.
- * The caller can specify a targetRpid, a groupId, both, or neither.
+ * The caller can specify a targetRpid, a groupId, or both.
  *
  * If the caller specifies a targetRpid, the warning will only be displayed for requests from that RP.
  *
