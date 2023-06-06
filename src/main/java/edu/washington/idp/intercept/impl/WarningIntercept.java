@@ -59,7 +59,7 @@ public class WarningIntercept implements Predicate<ProfileRequestContext> {
        log.debug("set webclient");
     }
     public UWHttpClient getWebClient() {
-       log.debug("set webclient");
+       log.debug("get webclient");
        return (webClient);
     }
 
@@ -81,7 +81,7 @@ public class WarningIntercept implements Predicate<ProfileRequestContext> {
     @Nullable private String groupId;
     public void setGroupId(String groupId) {
         this.groupId = groupId;
-        log.info("targetRpid = " + targetRpid);
+        log.info("groupId = " + groupId);
     }
 
     /** Constructor. */
