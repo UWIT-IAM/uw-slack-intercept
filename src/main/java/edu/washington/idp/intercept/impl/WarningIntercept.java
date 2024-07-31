@@ -21,12 +21,12 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.json.*;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import jakarta.json.*;
 
 import net.shibboleth.idp.authn.context.SubjectContext;
-import net.shibboleth.idp.profile.context.RelyingPartyContext;
+import net.shibboleth.profile.context.RelyingPartyContext;
 import net.shibboleth.idp.session.context.navigate.CanonicalUsernameLookupStrategy;
 import org.opensaml.profile.context.ProfileRequestContext;
 
@@ -105,9 +105,9 @@ public class WarningIntercept implements Predicate<ProfileRequestContext> {
             if (targetRpid != null && !targetRpid.isEmpty()) {
                 //verify that the relying party matches
                 try {
-                    RelyingPartyContext rpc = (RelyingPartyContext) input.getSubcontext("net.shibboleth.idp.profile.context.RelyingPartyContext");
+                    RelyingPartyContext rpc = (RelyingPartyContext) input.getSubcontext("net.shibboleth.profile.context.RelyingPartyContext");
                     rpid = rpc.getRelyingPartyId();
-                } catch (ClassNotFoundException e) {
+                } catch (Exception e) {
                     log.error("RelyingPartyContext not found: ", e);
                     return false;
                 }
