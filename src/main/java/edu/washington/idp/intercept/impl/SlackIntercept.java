@@ -30,14 +30,14 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.net.URLEncoder;
 
-import javax.json.*;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import jakarta.json.*;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 import net.shibboleth.utilities.java.support.annotation.constraint.NotEmpty;
 
 import net.shibboleth.idp.session.context.navigate.CanonicalUsernameLookupStrategy;
-import net.shibboleth.idp.profile.context.RelyingPartyContext;
+import net.shibboleth.profile.context.RelyingPartyContext;
 import net.shibboleth.utilities.java.support.logic.Constraint;
 import net.shibboleth.utilities.java.support.logic.FunctionSupport;
 
@@ -108,9 +108,9 @@ public class SlackIntercept {
         /// get the domain part of the rpid
         String rpid = null;
         try {
-           RelyingPartyContext rpc = (RelyingPartyContext) input.getSubcontext("net.shibboleth.idp.profile.context.RelyingPartyContext");
+           RelyingPartyContext rpc = (RelyingPartyContext) input.getSubcontext("net.shibboleth.profile.context.RelyingPartyContext");
            rpid = rpc.getRelyingPartyId();
-        } catch (ClassNotFoundException e) {
+        } catch (Exception e) {
            log.error("Slack lookup RPC not found: ", e);
            return true;
         }
