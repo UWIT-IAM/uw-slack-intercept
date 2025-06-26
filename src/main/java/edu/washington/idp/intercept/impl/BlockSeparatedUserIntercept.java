@@ -103,7 +103,7 @@ public class BlockSeparatedUserIntercept implements Predicate<ProfileRequestCont
      */
     public boolean test(@Nullable final ProfileRequestContext input) {
         try {
-            log.debug("Starting BlockAccessIntercept.test...");
+            log.debug("Starting BlockSeparatedUserIntercept.test...");
             if (input == null) {return NO_BLOCK;}
             if ( (groupId == null || groupId.isEmpty()) ) {
                 log.error("Misconfigured intercept: groupId not specified.");
@@ -116,7 +116,7 @@ public class BlockSeparatedUserIntercept implements Predicate<ProfileRequestCont
 
             boolean isInGroup = GroupUtils.getIsInGroup(input, webClient, gwsUrlbase, groupId);
             if (!isInGroup) {
-                log.debug("User is not in target group.");
+                log.debug("User is not in separated group.");
                 return NO_BLOCK;
             }
             
