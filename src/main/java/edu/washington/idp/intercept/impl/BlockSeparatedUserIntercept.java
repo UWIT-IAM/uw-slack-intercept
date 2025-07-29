@@ -114,7 +114,8 @@ public class BlockSeparatedUserIntercept implements Predicate<ProfileRequestCont
                 return NO_BLOCK;
             }
 
-            boolean isInGroup = GroupUtils.getIsInGroup(input, webClient, gwsUrlbase, groupId);
+            String username = GroupUtils.getUsername(input);
+            boolean isInGroup = GroupUtils.getIsInGroup(username, webClient, gwsUrlbase, groupId);
             if (!isInGroup) {
                 log.debug("User is not in separated group.");
                 return NO_BLOCK;
@@ -139,6 +140,8 @@ public class BlockSeparatedUserIntercept implements Predicate<ProfileRequestCont
                 log.error("Could not read allow file.");
                 // Show the warning in this case. We are choosing to fail closed here.
                 // Since we know the user is in the block group, assume block until proven otherwise.
+                // Also log a structured message indicating the failure to read the allow file.
+                log.info("BlockSeparatedUser|" + username + "|" + rpid + "|failedRead");
                 return BLOCK_ACCESS;
             }
             
@@ -153,6 +156,8 @@ public class BlockSeparatedUserIntercept implements Predicate<ProfileRequestCont
             } else {
                 //the rpid is not allowed, so block access.
                 log.info("RP is not in the allow list, show block message.");
+                //the following is a structured message to assist with reporting blocks
+                log.info("BlockSeparatedUser|" + username + "|" + rpid);
                 return BLOCK_ACCESS;
             }
         } catch (Exception e) {
