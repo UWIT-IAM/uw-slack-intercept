@@ -41,29 +41,24 @@ public class GroupUtils {
     private static Logger log = LoggerFactory.getLogger(GroupUtils.class);
     
     /**
-     * Returns true if the authenticated user is in the target group.
+     * Returns the username extracted from the provided context object.
+     * Returns null after logging a warning message if no username was found
      * @param input the context object from which the username is obtained
-     * @param webClient the web client to use to make the call
-     * @param gwsUrlbase the base of the groups URL to build the final URL
-     * @param groupId the name/id of the group to check
-     * @return true if the user is in the group, false if not
-     * @throws Exception if any occur while performing the call
+     * @return the username, or null if not found
      */
-    public static boolean getIsInGroup(final ProfileRequestContext input, UWHttpClient webClient, String gwsUrlbase, String groupId) throws Exception {
-        // Get the login id.
+    public static String getUsername(final ProfileRequestContext input) {
         SubjectContext subject = input.getSubcontext(SubjectContext.class);
         if (subject == null) {
             log.warn("No subject context found");
-            return NOT_USER_IN_GROUP;
+            return null;
         }
-        
         String username = subject.getPrincipalName();
         if (username == null) {
             log.warn("No principal name available");
-            return NOT_USER_IN_GROUP;
+            return null;
         }
         log.debug("user " + username + " found in SubjectContext");
-        return getIsInGroup(username, webClient, gwsUrlbase, groupId);
+        return username;
     }
     
     /**
@@ -85,7 +80,7 @@ public class GroupUtils {
             resp = webClient.getResource(gwsUrlbase + groupId + "/effective_member/" + username);
         } finally {
             long duration = System.currentTimeMillis() - startDttm;
-            log.info("Warning lookup finish: user={}, group={}, time={}", username, groupId, duration);
+            log.info("gws lookup finish: user={}, group={}, time={}", username, groupId, duration);
         }
         
         if (resp == null) {
