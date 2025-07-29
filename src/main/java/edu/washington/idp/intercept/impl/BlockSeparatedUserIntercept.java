@@ -157,7 +157,7 @@ public class BlockSeparatedUserIntercept implements Predicate<ProfileRequestCont
                 //the rpid is not allowed, so block access.
                 log.info("RP is not in the allow list, show block message.");
                 //the following is a structured message to assist with reporting blocks
-                log.info("BlockSeparatedUser|" + username + "|" + rpid);
+                log.info("BLOCK_SEPARATED_USER|" + username + "|" + rpid);
                 return BLOCK_ACCESS;
             }
         } catch (Exception e) {
