@@ -237,6 +237,8 @@ public class PasswordRecoveryIntercept implements Predicate<ProfileRequestContex
                 return NO_WARNING;
             }
             if (targetEntityId == null || passwordEntityId.equals(targetEntityId)) {return NO_WARNING;}
+            //The VPN cannot handle the link to the identity site. Show no warning for those sites as well.
+            if (targetEntityId.contains("huskyonnet")) {return NO_WARNING;}
 
             // Get the username. If not available, this call will log an error and return null,
             // in which case we will not show a warning.
